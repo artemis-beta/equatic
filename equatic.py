@@ -247,23 +247,26 @@ class EquationParser(object):
         max = self.evaluate_first_layer_val(value)
         self.logger.debug("Evaluating equation for value %s", value)
         k = 0
-        for i in range(1, max+1):
-            try:
-               k = self.evaluate_layer_i(max-i, value)
-            except ValueError:
-                sys.exit()
-        get_first_valid_key = True
-        self.logger.debug("Finding First Element of Dictionary.")
-        while get_first_valid_key:
-            try:
-                output_y = self._marked_dict_temp[k][0]
-                get_first_valid_key = False
-            except:
-                k+=1
-                output_y = self._marked_dict_temp[k][0]
-                if len(self._marked_dict_temp) == 0:
-                    self.logger.error("Dictionary size is zero.")
+        if len(self._marked_dict_temp) > 1:
+            for i in range(1, max+1):
+                try:
+                    k = self.evaluate_layer_i(max-i, value)
+                except ValueError:
                     sys.exit()
+            get_first_valid_key = True
+            self.logger.debug("Finding First Element of Dictionary.")
+            while get_first_valid_key:
+                try:
+                    output_y = self._marked_dict_temp[k][0]
+                    get_first_valid_key = False
+                except:
+                    k+=1
+                    output_y = self._marked_dict_temp[k][0]
+                    if len(self._marked_dict_temp) == 0:
+                        self.logger.error("Dictionary size is zero.")
+                        sys.exit()
+        else:
+            output_y = self._marked_dict_temp[max][0]
         output_y = output_y.replace('(', '').replace(')', '')
         output_y = float(output_y)
         info_out='''
@@ -323,7 +326,7 @@ class EquationParser(object):
         except:
             self.logger.error("Failed to find y values.")
             sys.exit()
-        
+
         if len(arr_y) > 0:
             self.logger.info("Successfully calculated %s/%s values.", len(arr_y), len(self.xarray))
         else:
