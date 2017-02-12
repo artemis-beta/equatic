@@ -12,9 +12,13 @@ class TestEQTC(unittest.TestCase):
         test_parser = EquationParser('testLinear', xarray=test_array, log='ERROR')
         test_y = test_parser.parse_equation_string('x-1')
         y = test_array - 1
-        plt.plot(test_array, test_y)
-        plt.plot(test_array, y)
+        plt.xlabel('x')
+        plt.ylabel('f(x)')
+        test_plot, = plt.plot(test_array, test_y, label='EquatIC')
+        comp_plot, = plt.plot(test_array, y, label='mpmath')
+        plt.legend(handles=[test_plot, comp_plot])
         plt.savefig("TEST00Plot.png")
+        plt.close()
         self.assertListEqual(test_y.round(4).tolist(), y.round(4).tolist())
 
     def test_function_1(self):
@@ -22,10 +26,14 @@ class TestEQTC(unittest.TestCase):
         test_array1 = np.linspace(-10*np.pi, 10*np.pi, 1000)
         test_parser1 = EquationParser('testFunction1', xarray=test_array1, log='ERROR')
         test_y1 = test_parser1.parse_equation_string('sinc(x)')
+        plt.xlabel('x')
+        plt.ylabel('f(x)')
         y1 = np.array([float(mpm.sinc(i)) for i in test_array1])
-        plt.plot(test_array1, test_y1)
-        plt.plot(test_array1, y1)
+        test_plot, = plt.plot(test_array1, test_y1, label='EquatIC')
+        comp_plot, = plt.plot(test_array1, y1, label='mpmath')
+        plt.legend(handles=[test_plot, comp_plot])
         plt.savefig("TEST01Plot.png")
+        plt.close()
         self.assertListEqual(test_y1.round(4).tolist(), y1.round(4).tolist())
 
     def test_function_2(self):
@@ -33,10 +41,14 @@ class TestEQTC(unittest.TestCase):
         test_array2 = np.linspace(-10*np.pi, 10*np.pi, 1000)
         test_parser2 = EquationParser('testFunction2', xarray=test_array2, log='ERROR')
         test_y2 = test_parser2.parse_equation_string('cos(tan(0.5*x+1)+sin(0.5*x))')
+        plt.xlabel('x')
+        plt.ylabel('f(x)')
         y2 = np.array([float(mpm.cos(mpm.tan(0.5*i+1)+mpm.sin(0.5*i))) for i in test_array2])
-        plt.plot(test_array2, test_y2)
-        plt.plot(test_array2, y2)
+        test_plot, = plt.plot(test_array2, test_y2, label='EquatIC')
+        comp_plot, = plt.plot(test_array2, y2, label='mpmath')
+        plt.legend(handles=[test_plot, comp_plot])
         plt.savefig("TEST02Plot.png")
+        plt.close()
         self.assertListEqual(test_y2.round(4).tolist(), y2.round(4).tolist())
 
     def test_complexnum_case(self):
@@ -48,7 +60,7 @@ class TestEQTC(unittest.TestCase):
 
     def test_danger_case(self):
         print("\nRunning Danger Case Test: 'sudo rm -rf asdf_jkl'\n")
-        test_parser4 = EquationParser('testDanger', log='DEBUG')
+        test_parser4 = EquationParser('testDanger', log='ERROR')
         with self.assertRaises(SystemExit):
             test_parser4.parse_equation_string('sudo rm -rf asdf_jkl')
 
