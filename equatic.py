@@ -7,7 +7,7 @@ Parser for equations as strings which avoids using the 'unclean' method of eval(
 @author: Kristian Zarebski
 @data: Last modified - 2017/02/11
 '''
-version = 'v0.1.3'
+version = 'v0.1.4'
 author = 'Kristian Zarebski'
 
 import logging
@@ -86,17 +86,10 @@ class EquationParser(object):
         keys += 'x'
         for key in keys:
             string = string.replace(key, '')
-        try:
-          if len(list(remainders)) != 0:
-               raise SystemExit()
-          elif len(string) != 0:
-               raise SyntaxError()
-        except SystemExit:
-            self.logger.critical("String contains Dangerous characters and will not be processed. Operation has terminated.")
-            sys.exit(1) #HACK - Cannot get SystemExit to work properly
-        except SyntaxError:
-            self.logger.error("String contains unrecognised character combinations.")
-            sys.exit()
+        if len(list(remainders)) != 0:
+               raise SystemExit
+        elif len(string) != 0:
+               raise SyntaxError
 
     def set_logger_level(self, level):
         '''Set Level of output for Equation Parser Log'''
@@ -285,7 +278,13 @@ class EquationParser(object):
     def parse_equation_string(self, eqn_string):
         self.logger.info(self._title)
         self.logger.debug(self._full_name)
-        self.clean_input(eqn_string)
+        try:
+             self.clean_input(eqn_string)
+        except SystemExit:
+            self.logger.critical("String contains Dangerous characters and will not be processed. Operation has terminated.")
+        except SyntaxError:
+            self.logger.error("String contains unrecognised character combinations.")
+            sys.exit()
         '''Parse an equation which is of type string'''
         debug_title = '''
         --------------------------------------------------------------
