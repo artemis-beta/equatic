@@ -7,7 +7,7 @@ Parser for equations as strings which avoids using the 'unclean' method of eval(
 @author: Kristian Zarebski
 @data: Last modified - 2017/02/11
 '''
-version = 'v0.1.4'
+version = 'v0.1.5'
 author = 'Kristian Zarebski'
 
 import logging
@@ -87,9 +87,11 @@ class EquationParser(object):
         for key in keys:
             string = string.replace(key, '')
         if len(list(remainders)) != 0:
+               self.logger.critical("String contains Dangerous characters and will not be processed. Operation has terminated.")
                raise SystemExit
         elif len(string) != 0:
-               raise SyntaxError
+               self.logger.error("String contains unrecognised character combinations.")
+               raise SystemExit
 
     def set_logger_level(self, level):
         '''Set Level of output for Equation Parser Log'''
@@ -111,23 +113,23 @@ class EquationParser(object):
         '''Apply an operation to a value using parser operation dictionary'''
         try:
             operation[:1]
-        except TypeError:
+        except:
             self.logger.error("Operation must be of type 'string'.")
-            sys.exit()
+            raise TypeError
         try:
             simplify(val_str)
-        except ValueError:
-            self.logger.error("Could not apply '%s' method to '%s'", operation, val_str)
-            sys.exit()
+        except:
+            self.logger.error("Could not simplify '%s'", val_str)
+            raise ValueError
         try:
             val_str = str(simplify(val_str))
             self.logger.debug("Attempting to apply %s(%s)", operation, val_str)
             val_str = val_str.replace('(', '').replace(')', '') 
             val = self.parser_dict[operation](float(val_str))
             return '({})'.format(val)
-        except KeyError:
+        except:
             self.logger.error("Operation failed: Could not resolve %s(%s)", operation, val_str)
-
+            raise ArithmeticError
     def check_for_ops(self, string):
         for key in self.parser_dict:
             if key in string:
@@ -140,7 +142,10 @@ class EquationParser(object):
                 string = str(simplify(string))
                 print("string", string)
                 print("lower part {}".format(string))
-                string = self.apply_op(key, string)
+                try:
+                    string = self.apply_op(key, string)
+                except:
+                    raise SystemExit
                 self.logger.debug("Evaluated operation and obtained value '%s'", string)
                 if 'j' in string:
                     self.logger.critical("This version of EquatIC does not support computation of complex numbers.")
@@ -278,13 +283,7 @@ class EquationParser(object):
     def parse_equation_string(self, eqn_string):
         self.logger.info(self._title)
         self.logger.debug(self._full_name)
-        try:
-             self.clean_input(eqn_string)
-        except SystemExit:
-            self.logger.critical("String contains Dangerous characters and will not be processed. Operation has terminated.")
-        except SyntaxError:
-            self.logger.error("String contains unrecognised character combinations.")
-            sys.exit()
+        self.clean_input(eqn_string)            
         '''Parse an equation which is of type string'''
         debug_title = '''
         --------------------------------------------------------------
