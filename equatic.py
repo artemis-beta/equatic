@@ -1,0 +1,332 @@
+'''
+Equation Parser Module
+----------------------
+
+Parser for equations as strings which avoids using the 'unclean' method of eval() within python.
+
+@author: Kristian Zarebski
+@data: Last modified - 2017/02/11
+'''
+version = 'v0.1.2'
+author = 'Kristian Zarebski'
+
+import logging
+import sympy.mpmath as mt
+from sympy import simplify
+from numpy import atleast_1d, array
+from copy import deepcopy
+import re, sys
+
+class EquationParser(object):
+    '''Equation Parser Class'''
+
+    def __init__(self, name, xarray=1E-36, log='INFO'):
+        trig_dict = {'asin': mt.asin, 'acos': mt.acos, 'atan': mt.tan,
+                     'cospi': mt.cospi, 'sinpi': mt.sinpi, 'sinc': mt.sinc,
+                     'sin': mt.sin, 'cos': mt.cos, 'tan': mt.tan,
+                     'cosec': mt.csc, 'sec': mt.sec, 'cot': mt.cot}
+        hyp_dict = {'asinh': mt.asinh, 'acosh': mt.acosh, 'atanh': mt.tanh,
+                    'sinh': mt.sinh, 'cosh': mt.cosh, 'tanh': mt.tan,
+                    'cosech': mt.csch, 'sech': mt.sech, 'coth': mt.coth}
+
+        log_ind_dict = {'log10': mt.log10, 'exp': mt.exp, 'log': mt.log}
+
+        others_dict = {'sqrt': mt.sqrt, 'cbrt': mt.cbrt, 'root': mt.root,
+                       'power': mt.power, 'expm1': mt.expm1,
+                       'fac': mt.factorial, 'fac2': mt.fac2, 'gamma': mt.gamma,
+                       'rgamma': mt.gamma, 'loggamma': mt.loggamma,
+                       'superfac': mt.superfac, 'hyperfac': mt.hyperfac,
+                       'barnesg': mt.barnesg, 'psi': mt.psi,
+                       'harmonic': mt.harmonic}
+
+        self._title = '''
+        ==========================================================
+                          Welcome to EquatIC {}
+
+                            Kristian Zarebski
+
+        A 'safe' parser which allows the processing of strings
+        via the Sympy 'simplify' method with the added level of
+        security against dangerous input.
+
+        ==========================================================
+
+        '''.format(version)
+        self.name = name
+        self._full_name = 'Launching Equation Interpretor and Calculator...'
+        self.parser_dict = {}
+        self.parser_dict.update(hyp_dict)
+        self.parser_dict.update(trig_dict)
+        self.parser_dict.update(log_ind_dict)
+        self.parser_dict.update(others_dict)
+        self.xarray = xarray
+        self.user_marked_dict = {}
+        self._marked_dict_temp = None
+        self.eqn_string = ''
+        self.logger = logging.getLogger(__name__)
+        self.set_logger_level(log)   
+        logging.basicConfig()
+        self.eqn_string_template = ''
+        self.eqn_string_id = ''
+        self.accepted_opts = [')', '+', '-', '/', '*', '**']
+        
+        if not log in ['WARNING', 'DEBUG', 'ERROR', 'CRITICAL', 'INFO']:
+            self.logger.error("Invalid logger mode '%s'", log)
+            sys.exit()
+
+    def clean_input(self, string):
+        remainders = ''
+        bad_chars = [';', '\\', '{', '}', '@', '$', '^', '&', 'rm', 'sudo', '~', '!', '#', ':', '|', '`', '\'', '"']
+        for char in bad_chars:
+            if char in string:
+                remainders += char
+        string = re.sub(r'\W+', '', string)
+        string = re.sub(r'\d+', '', string)
+        keys = [key for key in self.parser_dict]
+        keys += 'x'
+        for key in keys:
+            string = string.replace(key, '')
+        try:
+          if len(list(remainders)) != 0:
+               raise SystemExit()
+          elif len(string) != 0:
+               raise SyntaxError()
+        except SystemExit:
+            self.logger.critical("String contains Dangerous characters and will not be processed. Operation has terminated.")
+            sys.exit(1) #HACK - Cannot get SystemExit to work properly
+        except SyntaxError:
+            self.logger.error("String contains unrecognised character combinations.")
+            sys.exit()
+
+    def set_logger_level(self, level):
+        '''Set Level of output for Equation Parser Log'''
+        if level == 'DEBUG':
+            self.logger.setLevel(logging.DEBUG)
+        elif level == 'INFO':
+            self.logger.setLevel(logging.INFO)
+        elif level == 'WARNING':
+            self.logger.setLevel(logging.WARNING)
+        elif level == 'CRITICAL':
+            self.logger.setLevel(logging.CRITICAL)
+        elif level == 'ERROR':
+            self.logger.setLevel(logging.ERROR)
+        else:
+            self.logger.error("Invalid Logger Setting %s.", level)        
+
+
+    def apply_op(self, operation, val_str):
+        '''Apply an operation to a value using parser operation dictionary'''
+        try:
+            operation[:1]
+        except TypeError:
+            self.logger.error("Operation must be of type 'string'.")
+            sys.exit()
+        try:
+            simplify(val_str)
+        except ValueError:
+            self.logger.error("Could not apply '%s' method to '%s'", operation, val_str)
+            sys.exit()
+        try:
+            val_str = str(simplify(val_str))
+            self.logger.debug("Attempting to apply %s(%s)", operation, val_str)
+            val_str = val_str.replace('(', '').replace(')', '') 
+            val = self.parser_dict[operation](float(val_str))
+            return '({})'.format(val)
+        except KeyError:
+            self.logger.error("Operation failed: Could not resolve %s(%s)", operation, val_str)
+
+    def check_for_ops(self, string):
+        for key in self.parser_dict:
+            if key in string:
+                self.logger.debug("Found the operation '%s' in string.", key)
+                index = string.find(key)
+                index_2 = index
+                while string[index_2] != ')':
+                    index_2 +=1
+                string = string.replace(key, '')
+                string = self.apply_op(key, string[index:index_2])
+                self.logger.debug("Evaluated operation and obtained value '%s'", string)
+                if 'j' in string:
+                    self.logger.critical("This version of EquatIC does not support computation of complex numbers.")
+                    raise ValueError
+        return string
+
+    def create_id_syntax(self, string=None):
+        '''Create a string of digits to symbolize level of parenthesis'''
+        if not string:
+            string = self.eqn_string
+        digi = 0
+        self.logger.debug("Generating parenthesis level and marked equation strings.")
+        for n_i, element in enumerate(string):
+            if element == '(':
+                self.eqn_string_template += '#'
+                self.eqn_string_id += '{}'.format(digi+1)
+                digi += 1
+            elif self.eqn_string[n_i-1] == ')':
+                digi -= 1
+            self.eqn_string_template += element
+            self.eqn_string_id += '{}'.format(digi+1)
+        self.logger.debug("Level String '%s' generated.", self.eqn_string_id)
+        self.logger.debug("Marked String '%s' generated", self.eqn_string_template)
+
+    def create_parse_dictionary(self):
+        '''Create Dictionary for Equation Layers'''
+        self.logger.debug("Initialising New Equation Layers Dictionary.")
+
+        for i, j in zip(self.eqn_string_id, self.eqn_string_template):
+            try:
+                if self.user_marked_dict[int(i)][-1] in self.accepted_opts or self.user_marked_dict[int(i)][-1] in self.parser_dict.keys():
+                    self.user_marked_dict[int(i)] += '|'
+                self.user_marked_dict[int(i)] += j
+            except:
+                self.user_marked_dict[int(i)] = j
+        for key in self.user_marked_dict:
+            for element in self.accepted_opts[1:]:
+                self.user_marked_dict[key] = self.user_marked_dict[key].replace('{}|'.format(element),'{}'.format(element))
+        self.logger.debug("Successfully created dictionary:\n %s", self.user_marked_dict)
+
+    def recursive_split(self, string):
+        init_string = string
+        string = string.split('|')
+        try:
+            string = string[:-1] + string[-1].split('|')
+        except:
+            self.logger.debug("Successfully split string: %s", init_string)
+        return string
+
+    def evaluate_first_layer_val(self, value):
+        keys = [key for key in self._marked_dict_temp]
+        try:
+            maximum = max(keys)
+        except ValueError:
+            self.logger.error("Failed to get maximum from equation dictionary.")
+            if len(keys) == 0:
+                self.logger.error("Equation dictionary is empty. Perhaps you have tried to evaluate f(x) "+
+                                  "where it is undefined? Try to run in debug mode for more information.")
+            sys.exit()
+        result = (self._marked_dict_temp[maximum].replace('x', '{}'.format(value)))
+        result = self.recursive_split(result)
+        self.logger.debug("Using Sympy Simplify to parse %s", result)
+        try:
+            results = [str(simplify(r)) for r in result]
+            results = [self.check_for_ops(u) for u in results]
+        except ValueError:
+            self.logger.error("Could not evaluate strings %s", result)
+            sys.exit()
+        self._marked_dict_temp[maximum] = results
+        self.logger.debug("Innermost Layer set to '%s''", self._marked_dict_temp)
+        return maximum
+
+    def evaluate_layer_i(self, k, value):
+        output_string = ''
+        n = 0
+        prior_list = self._marked_dict_temp[k+1]
+        current_list = list(self._marked_dict_temp[k])
+        for i in range(len(current_list)):
+          if current_list[i] == '#':
+              current_list[i] = current_list[i].replace('#', '({})'.format(prior_list[n]))
+              n+=1
+        for char in current_list:
+            output_string += char
+        output_string =  output_string.replace('x', '({})'.format(value))
+        output_list = self.recursive_split(output_string)
+        for i, element in enumerate(output_list):
+            self.logger.debug("Checking for operations in section '%s'", output_list[i])
+            try:
+                output_list[i] = simplify(element)
+                output_list[i] = self.check_for_ops(element)
+            except:
+                self.logger.error("Operation check failed.")
+                sys.exit()
+        self.logger.debug("Processed Layer %s: %s", k, output_list)
+        self._marked_dict_temp[k] = output_list
+        return k
+
+    def evaluate_val(self, value):
+        self._marked_dict_temp = deepcopy(self.user_marked_dict)
+        max = self.evaluate_first_layer_val(value)
+        self.logger.debug("Evaluating equation for value %s", value)
+        k = 0
+        for i in range(1, max+1):
+            try:
+               k = self.evaluate_layer_i(max-i, value)
+            except ValueError:
+                sys.exit()
+        get_first_valid_key = True
+        self.logger.debug("Finding First Element of Dictionary.")
+        while get_first_valid_key:
+            try:
+                output_y = self._marked_dict_temp[k][0]
+                get_first_valid_key = False
+            except:
+                k+=1
+                output_y = self._marked_dict_temp[k][0]
+                if len(self._marked_dict_temp) == 0:
+                    self.logger.error("Dictionary size is zero.")
+                    sys.exit()
+        output_y = output_y.replace('(', '').replace(')', '')
+        output_y = float(output_y)
+        info_out='''
+
+        --------------------------------------------------------------
+                            F({}) = {}
+        --------------------------------------------------------------
+
+        '''.format(value, output_y)
+        self.logger.debug(info_out)
+        return output_y
+
+    def parse_equation_string(self, eqn_string):
+        self.logger.info(self._title)
+        self.logger.debug(self._full_name)
+        self.clean_input(eqn_string)
+        '''Parse an equation which is of type string'''
+        debug_title = '''
+        --------------------------------------------------------------
+        EQUATION TO PARSE: {}
+        X VALUES: 
+        {}
+        --------------------------------------------------------------
+
+        '''.format(eqn_string, self.xarray)
+
+        self.logger.debug(debug_title)
+        self.eqn_string = eqn_string
+        self.create_id_syntax()
+        self.create_parse_dictionary()
+        try:
+            return self.calculate(self.xarray)
+        except:
+            return None
+
+    def calculate(self, x):
+        self.logger.info("Calculating %s for stated x values.", self.eqn_string)
+        arr_x = atleast_1d(x)
+        arr_y = []
+        for x in arr_x:
+            arr_y.append(self.evaluate_val(x))
+        arr_y = array(arr_y)
+        y_output = '''
+
+        --------------------------------------------------------------
+
+        Y VALUES:
+        {}
+
+        --------------------------------------------------------------
+
+        '''.format(arr_y)
+
+        self.logger.debug(y_output)
+        try:
+            len(arr_y)
+        except:
+            self.logger.error("Failed to find y values.")
+            sys.exit()
+        
+        if len(arr_y) > 0:
+            self.logger.info("Successfully calculated %s/%s values.", len(arr_y), len(self.xarray))
+        else:
+            self.logger.error("Returned empty list of values.")
+
+        return arr_y
