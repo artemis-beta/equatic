@@ -7,7 +7,7 @@ Parser for equations as strings which avoids using the 'unclean' method of eval(
 @author: Kristian Zarebski
 @data: Last modified - 2017/02/11
 '''
-version = 'v0.1.2'
+version = 'v0.1.3'
 author = 'Kristian Zarebski'
 
 import logging
@@ -144,7 +144,10 @@ class EquationParser(object):
                 while string[index_2] != ')':
                     index_2 +=1
                 string = string.replace(key, '')
-                string = self.apply_op(key, string[index:index_2])
+                string = str(simplify(string))
+                print("string", string)
+                print("lower part {}".format(string))
+                string = self.apply_op(key, string)
                 self.logger.debug("Evaluated operation and obtained value '%s'", string)
                 if 'j' in string:
                     self.logger.critical("This version of EquatIC does not support computation of complex numbers.")
@@ -234,7 +237,7 @@ class EquationParser(object):
             self.logger.debug("Checking for operations in section '%s'", output_list[i])
             try:
                 output_list[i] = simplify(element)
-                output_list[i] = self.check_for_ops(element)
+                output_list[i] = self.check_for_ops(str(output_list[i]))
             except:
                 self.logger.error("Operation check failed.")
                 sys.exit()
