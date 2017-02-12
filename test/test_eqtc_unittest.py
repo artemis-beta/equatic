@@ -71,7 +71,10 @@ class TestEQTC(unittest.TestCase):
             test_parser7.apply_op('sin', '(0.67')
         
     def test_apply_op_failed(self):
-        print("\nRunning Operation Failure Test: ")
+        print("\nRunning Operation Failure Test: 'cosec(0)'")
+        test_parser8 = EquationParser('testOpFail', log='ERROR')
+        with self.assertRaises(ArithmeticError):
+            test_parser8.apply_op('cosec', 0)
 
 
 if __name__ == '__main__':

@@ -329,7 +329,7 @@ class EquationParser(object):
             sys.exit()
 
         if len(arr_y) > 0:
-            self.logger.info("Successfully calculated %s/%s values.", len(arr_y), len(self.xarray))
+            self.logger.info("Successfully calculated %s/%s values.", len(arr_y), len(arr_x))
         else:
             self.logger.error("Returned empty list of values.")
 
