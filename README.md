@@ -87,6 +87,8 @@ Currently in early development but available in this version is the console appl
 - `--save` or `-s` saves the output within the session
 - `--saveas` or `-o` does the same as the above but allows the user to specify an output file name
 
+`python equatic_app.py --verbose --saveas 'my_session.log'`
+
 ```
 EquatIC[0]: tan(1)
 1.55740772465
