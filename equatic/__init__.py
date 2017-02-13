@@ -7,7 +7,7 @@ Parser for equations as strings which avoids using the 'unclean' method of eval(
 @author: Kristian Zarebski
 @data: Last modified - 2017/02/11
 '''
-version = 'v0.1.5'
+version = 'v0.2.0'
 author = 'Kristian Zarebski'
 
 import logging

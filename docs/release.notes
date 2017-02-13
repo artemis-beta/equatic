@@ -4,6 +4,14 @@
 ! Purpose      : Safe equation string parser
 ! -------------------------------------------------------------------
 
+!========================= EquatIC v0.2.0 ===========================
+! 2017-02-13 - Kristian Zarebski
+
+ - Added console application with option to save output to a log
+ - Added the option for users to define their own functions to then
+   use within their equation parser instance
+ - Minor bug fixes
+
 !========================= EquatIC v0.1.5 ===========================
 ! 2017-02-12 - Kristian Zarebski
 
