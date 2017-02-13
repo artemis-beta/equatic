@@ -1,5 +1,23 @@
-# EquatIC v0.1.2
+# EquatIC v0.2.0
 Equatic is a string equation parser which utilises the Sympy and Numpy libraries to evaluate equations for a given set of values, the two aims being to include more functions than those included in other methods and to evaluate values without the risk of 'danger' which is currently present within these. 
+
+## Quick Use
+You can quickly parse either a single value or range of values using the following syntax:
+
+`equatic.parse('npdf(x)', 0.5)`
+
+In the case of using a value range either a length 2 or length 3 list can be given where the third argument is the optional number of points to calculate.
+
+`equatic.parse('npdf(x)', [-0.5, 0.5])`
+
+or
+
+`equatic.parse('npdf(x)', func_range=[-0.5, 0.5, 100], debug='ERROR')`
+
+## Plotting
+EquatIC uses Matplotlib to plot the results, similar to the case of `equatic.parse` a list is given which can have either two or three arguments depending on whether the user wishes to set the number of data points. The plots can also be saved to the current directory.
+
+`equatic.plot('harmonic(x)', func_range=[0, 10, 10], xlabel='x', ylabel='f(x)', debug='DEBUG', save='output.png')`
 
 ## Creating a Parser
 Below is an example of how the parser can be used, here a set of x values is generated using Numpy and then handed to the parser with the function then being parsed after. The x value set is not compulsary however when a set is specified the `parse_equation_string` method will return the resultant values for f(x). 
@@ -44,3 +62,20 @@ By default EquatIC parsers are set to be run with the logging level set to 'INFO
 `parser.set_logger_level('DEBUG')`
 
 for a full list of options see the documentation for the `logging` python module.
+
+## EquatIC Console App
+Currently in early development but available in this version is the console application which can currently be found in the `equatic` directory as `equatic_app.py` within the main package folder. The command to run the application can itself take options:
+
+- `--verbose` or `-v` sets the logging option to `DEBUG`
+- `--info` or `-i` sets the logging option to `INFO`
+- `--save` or `-s` saves the output within the session
+- `--saveas` or `-o` does the same as the above but allows the user to specify an output file name
+
+```
+EquatIC[0]: tan(1)
+1.55740772465
+EquatIC[1]: cos(1)
+0.540302305868
+```
+
+the session is exited using `quit` or `q`.
