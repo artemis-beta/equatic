@@ -37,7 +37,7 @@ class EquationParser(object):
                        'rgamma': mt.gamma, 'loggamma': mt.loggamma,
                        'superfac': mt.superfac, 'hyperfac': mt.hyperfac,
                        'barnesg': mt.barnesg, 'psi': mt.psi,
-                       'harmonic': mt.harmonic}
+                       'harmonic': mt.harmonic, 'npdf' : mt.npdf}
 
         self._title = '''
         ==========================================================
@@ -356,9 +356,15 @@ def parse(equation_string, func_range=None, debug='ERROR'):
 
 def plot(equation_string, func_range=[0.1, 10], xlabel='x', ylabel='y', debug='ERROR'):
     import matplotlib.pyplot as plt
-    temp_parser = EquationParser('temp')
-    temp_parser.set_logger_level(debug)
-    temp_parser.parse_equation_string(equation_string)
+    num = 1000
+    if len(func_range) > 2:
+        num = func_range[2]
+    else:
+        func_range.append(num)
+    x = linspace(func_range[0], func_range[1], func_range[2])
+    y = parse(equation_string, func_range, debug=debug)
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
-    plt.plot()
+    plt.plot(x, y)
+    plt.show()
+    plt.close()
