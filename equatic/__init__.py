@@ -13,7 +13,7 @@ author = 'Kristian Zarebski'
 import logging
 import sympy.mpmath as mt
 from sympy import simplify
-from numpy import atleast_1d, array
+from numpy import atleast_1d, array, linspace
 from copy import deepcopy
 import re, sys
 
@@ -76,7 +76,7 @@ class EquationParser(object):
 
     def clean_input(self, string):
         remainders = ''
-        bad_chars = [';', '\\', '{', '}', '@', '$', '^', '&', 'rm', 'sudo', '~', '!', '#', ':', '|', '`', '\'', '"']
+        bad_chars = [';', '\\', '{', '}', '@', '$', '^', '&', 'rm ', 'sudo', '~', '!', '#', ':', '|', '`', '\'', '"']
         for char in bad_chars:
             if char in string:
                 remainders += char
@@ -140,8 +140,6 @@ class EquationParser(object):
                     index_2 +=1
                 string = string.replace(key, '')
                 string = str(simplify(string))
-                print("string", string)
-                print("lower part {}".format(string))
                 try:
                     string = self.apply_op(key, string)
                 except:
@@ -202,7 +200,7 @@ class EquationParser(object):
         except ValueError:
             self.logger.error("Failed to get maximum from equation dictionary.")
             if len(keys) == 0:
-                self.logger.error("Equation dictionary is empty. Perhaps you have tried to evaluate f(x) "+
+                self.logger.error("Equation dictionary is empty. Did you forget to parse an equation string? or perhaps you have tried to evaluate f(x) "+
                                   "where it is undefined? Try to run in debug mode for more information.")
             sys.exit()
         result = (self._marked_dict_temp[maximum].replace('x', '{}'.format(value)))
@@ -269,7 +267,7 @@ class EquationParser(object):
         else:
             output_y = self._marked_dict_temp[max][0]
         output_y = output_y.replace('(', '').replace(')', '')
-        output_y = float(output_y)
+        output_y = float(simplify(output_y))
         info_out='''
 
         --------------------------------------------------------------
@@ -332,5 +330,32 @@ class EquationParser(object):
             self.logger.info("Successfully calculated %s/%s values.", len(arr_y), len(arr_x))
         else:
             self.logger.error("Returned empty list of values.")
+        
+        if len(arr_y) == 1:
+            return arr_y[0]
 
         return arr_y
+
+def parse(equation_string, func_range=None, debug='ERROR'):
+    temp_parser = EquationParser('temp')
+    temp_parser.set_logger_level(debug)
+    temp_parser.parse_equation_string(equation_string)
+    if not isinstance(func_range, list):
+        if not func_range:
+            x = 0
+        x = func_range 
+    elif len(func_range) == 2:
+        x = linspace(func_range[0], func_range[1], 1000)
+    else:
+        x = linspace(func_range[0], func_range[1], func_range[2])
+
+    return temp_parser.calculate(x)
+
+def plot(equation_string, func_range=[0.1, 10], xlabel='x', ylabel='y', debug='ERROR'):
+    import matplotlib.pyplot as plt
+    temp_parser = EquationParser('temp')
+    temp_parser.set_logger_level(debug)
+    temp_parser.parse_equation_string(equation_string)
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.plot()
