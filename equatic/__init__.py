@@ -336,6 +336,9 @@ class EquationParser(object):
 
         return arr_y
 
+    def add_function(self, name, func):
+        self.parser_dict[name] = func
+
 def parse(equation_string, func_range=None, debug='ERROR'):
     temp_parser = EquationParser('temp')
     temp_parser.set_logger_level(debug)

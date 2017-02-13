@@ -88,6 +88,14 @@ class TestEQTC(unittest.TestCase):
         with self.assertRaises(ArithmeticError):
             test_parser8.apply_op('cosec', 0)
 
+    def test_new_func(self):
+        print("\nRunning New Function Test: 'reciprocal(2)'")
+        test_parser8 = EquationParser('testnewFunc', log='ERROR')
+        def reciprocal(num):
+            return float(1./num)
+        test_parser8.add_function('reciprocal', reciprocal)
+        y = test_parser8.parse_equation_string('reciprocal(2)')
+        self.assertEqual(0.5, y)
 
 if __name__ == '__main__':
     unittest.main()
