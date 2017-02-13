@@ -1,3 +1,4 @@
 .eggs
 eqparsetest.py
 *.png
+*.pyc

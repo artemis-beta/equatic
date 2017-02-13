@@ -23,8 +23,8 @@ class EquationParser(object):
     def __init__(self, name, xarray=1E-36, log='INFO'):
         trig_dict = {'asin': mt.asin, 'acos': mt.acos, 'atan': mt.tan,
                      'cospi': mt.cospi, 'sinpi': mt.sinpi, 'sinc': mt.sinc,
-                     'sin': mt.sin, 'cos': mt.cos, 'tan': mt.tan,
-                     'cosec': mt.csc, 'sec': mt.sec, 'cot': mt.cot}
+                     'cosec': mt.csc, 'sec': mt.sec, 'cot': mt.cot, 
+                     'sin': mt.sin, 'cos': mt.cos, 'tan': mt.tan}
         hyp_dict = {'asinh': mt.asinh, 'acosh': mt.acosh, 'atanh': mt.tanh,
                     'sinh': mt.sinh, 'cosh': mt.cosh, 'tanh': mt.tan,
                     'cosech': mt.csch, 'sech': mt.sech, 'coth': mt.coth}
