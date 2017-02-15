@@ -342,6 +342,7 @@ class EquationParser(object):
 def parse(equation_string, func_range=None, debug='ERROR'):
     temp_parser = EquationParser('temp')
     temp_parser.set_logger_level(debug)
+    equation_string = '({})'.format(equation_string)
     temp_parser.parse_equation_string(equation_string)
     if not isinstance(func_range, list):
         if not func_range:
