@@ -202,7 +202,7 @@ class EquationParser(object):
             if len(keys) == 0:
                 self.logger.error("Equation dictionary is empty. Did you forget to parse an equation string? or perhaps you have tried to evaluate f(x) "+
                                   "where it is undefined? Try to run in debug mode for more information.")
-            sys.exit()
+            raise SystemExit
         result = (self._marked_dict_temp[maximum].replace('x', '({})'.format(value)))
         result = self.recursive_split(result)
         self.logger.debug("Using Sympy Simplify to parse %s", result)
@@ -211,7 +211,7 @@ class EquationParser(object):
             results = [self.check_for_ops(u) for u in results]
         except ValueError:
             self.logger.error("Could not evaluate strings %s", result)
-            sys.exit()
+            raise SystemExit
         self._marked_dict_temp[maximum] = results
         self.logger.debug("Innermost Layer set to '%s''", self._marked_dict_temp)
         return maximum
@@ -236,7 +236,7 @@ class EquationParser(object):
                 output_list[i] = self.check_for_ops(str(output_list[i]))
             except:
                 self.logger.error("Operation check failed.")
-                sys.exit()
+                raise SystemExit
         self.logger.debug("Processed Layer %s: %s", k, output_list)
         self._marked_dict_temp[k] = output_list
         return k
@@ -247,11 +247,11 @@ class EquationParser(object):
         self.logger.debug("Evaluating equation for value %s", value)
         k = 0
         if len(self._marked_dict_temp) > 1:
-            for i in range(1, max+1):
+            for i in range(1, max):
                 try:
                     k = self.evaluate_layer_i(max-i, value)
                 except ValueError:
-                    sys.exit()
+                    raise SystemExit
             get_first_valid_key = True
             self.logger.debug("Finding First Element of Dictionary.")
             while get_first_valid_key:
@@ -263,7 +263,7 @@ class EquationParser(object):
                     output_y = self._marked_dict_temp[k][0]
                     if len(self._marked_dict_temp) == 0:
                         self.logger.error("Dictionary size is zero.")
-                        sys.exit()
+                        raise SystemExit
         else:
             output_y = self._marked_dict_temp[max][0]
         output_y = output_y.replace('(', '').replace(')', '')
