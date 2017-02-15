@@ -355,7 +355,7 @@ def parse(equation_string, func_range=None, debug='ERROR'):
 
     return temp_parser.calculate(x)
 
-def plot(equation_string, func_range=[0.1, 10], xlabel='x', ylabel='y', debug='ERROR', plot_opts = '-', save=None, show=True):
+def plot(equation_string, func_range=[0.1, 10], xlabel='x', ylabel='y', debug='ERROR', plot_opts = '-', save=None, show=True, title=None):
     import matplotlib.pyplot as plt
     num = 1000
     if len(func_range) > 2:
@@ -364,6 +364,8 @@ def plot(equation_string, func_range=[0.1, 10], xlabel='x', ylabel='y', debug='E
         func_range.append(num)
     x = linspace(func_range[0], func_range[1], func_range[2])
     y = parse(equation_string, func_range, debug=debug)
+    if title:
+        plt.title(title)
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
     plt.plot(x, y, plot_opts)
