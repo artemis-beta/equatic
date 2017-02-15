@@ -97,5 +97,35 @@ class TestEQTC(unittest.TestCase):
         y = test_parser8.parse_equation_string('reciprocal(2)')
         self.assertEqual(0.5, y)
 
+    def test_square_func(self):
+        print("\nRunning Function Test: 'x**2'")
+        test_array = np.linspace(-10, 10, 1000)
+        test_parser = EquationParser('testSquare', xarray=test_array, log='ERROR')
+        test_y = test_parser.parse_equation_string('x**2')
+        y = np.square(test_array)
+        plt.xlabel('x')
+        plt.ylabel('f(x)')
+        test_plot, = plt.plot(test_array, test_y, label='EquatIC')
+        comp_plot, = plt.plot(test_array, y, label='mpmath')
+        plt.legend(handles=[test_plot, comp_plot])
+        plt.savefig("TEST03Plot.png")
+        plt.close()
+        self.assertListEqual(test_y.round(4).tolist(), y.round(4).tolist())
+
+    def test_tanMsin_func(self):
+        print("\nRunning Function Test: 'tan(x)-sin(x)'")
+        test_array = np.linspace(-10, 10, 1000)
+        test_parser = EquationParser('testSquare', xarray=test_array, log='ERROR')
+        test_y = test_parser.parse_equation_string('tan(x)-sin(x)')
+        y = np.tan(test_array)-np.sin(test_array)
+        plt.xlabel('x')
+        plt.ylabel('f(x)')
+        test_plot, = plt.plot(test_array, test_y, label='EquatIC')
+        comp_plot, = plt.plot(test_array, y, label='mpmath')
+        plt.legend(handles=[test_plot, comp_plot])
+        plt.savefig("TEST04Plot.png")
+        plt.close()
+        self.assertListEqual(test_y.round(4).tolist(), y.round(4).tolist())
+
 if __name__ == '__main__':
     unittest.main()

@@ -11,7 +11,7 @@ version = 'v0.2.0'
 author = 'Kristian Zarebski'
 
 import logging
-import sympy.mpmath as mt
+import mpmath as mt
 from sympy import simplify
 from numpy import atleast_1d, array, linspace
 from copy import deepcopy
@@ -203,7 +203,7 @@ class EquationParser(object):
                 self.logger.error("Equation dictionary is empty. Did you forget to parse an equation string? or perhaps you have tried to evaluate f(x) "+
                                   "where it is undefined? Try to run in debug mode for more information.")
             sys.exit()
-        result = (self._marked_dict_temp[maximum].replace('x', '{}'.format(value)))
+        result = (self._marked_dict_temp[maximum].replace('x', '({})'.format(value)))
         result = self.recursive_split(result)
         self.logger.debug("Using Sympy Simplify to parse %s", result)
         try:
