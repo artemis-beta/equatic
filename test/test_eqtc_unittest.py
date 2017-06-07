@@ -1,7 +1,7 @@
 import unittest
 from equatic import EquationParser
 import matplotlib.pyplot as plt
-import sympy.mpmath as mpm
+import mpmath as mpm
 import numpy as np
 import sys
 
