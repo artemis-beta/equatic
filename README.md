@@ -30,11 +30,6 @@ or
 
 `equatic.parse('npdf(x)', func_range=[-0.5, 0.5, 100], debug='ERROR')`
 
-## Plotting
-EquatIC uses Matplotlib to plot the results, similar to the case of `equatic.parse` a list is given which can have either two or three arguments depending on whether the user wishes to set the number of data points. The plots can also be saved to the current directory.
-
-`equatic.plot('harmonic(x)', func_range=[0, 10, 10], xlabel='x', ylabel='f(x)', debug='DEBUG', save='output.png')`
-
 ## Creating a Parser
 Below is an example of how the parser can be used, here a set of x values is generated using Numpy and then handed to the parser with the function then being parsed after. The x value set is not compulsary however when a set is specified the `parse_equation_string` method will return the resultant values for f(x). 
 
