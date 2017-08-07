@@ -1,0 +1,5 @@
+numpy>=1.11.3
+sympy>=1.0
+matplotlib>=2.0.0
+mpmath
+nose2
