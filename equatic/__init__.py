@@ -5,9 +5,9 @@ Equation Parser Module
 Parser for equations as strings which avoids using the 'unclean' method of eval() within python.
 
 @author: Kristian Zarebski
-@data: Last modified - 2017/02/11
+@data: Last modified - 2017/08/07
 '''
-version = 'v0.2.0'
+version = 'v1.0.0'
 author = 'Kristian Zarebski'
 
 import logging

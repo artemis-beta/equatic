@@ -4,6 +4,13 @@
 ! Purpose      : Safe equation string parser
 ! -------------------------------------------------------------------
 
+!========================= EquatIC v1.0.0 ===========================
+! 2017-08-07 - Kristian Zarebski
+
+ - First version to pass all created tests
+ - Fixed major bug which meant only the 'parse' method worked, the 
+   class object is now also able to properly calculate
+
 !========================= EquatIC v0.2.0 ===========================
 ! 2017-02-13 - Kristian Zarebski
 
