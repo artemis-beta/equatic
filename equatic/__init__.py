@@ -251,6 +251,7 @@ class EquationParser(object):
                 try:
                     k = self.evaluate_layer_i(max-i, value)
                 except ValueError:
+                    self.logger.error("Could not evaluate equation layer %s",i)
                     raise SystemExit
             get_first_valid_key = True
             self.logger.debug("Finding First Element of Dictionary.")
@@ -267,6 +268,14 @@ class EquationParser(object):
         else:
             output_y = self._marked_dict_temp[max][0]
         output_y = output_y.replace('(', '').replace(')', '')
+        self.logger.debug("Simplifying '%s'", output_y)
+        self.logger.debug("Converting '%s' to float", simplify(output_y))
+        output_y = float(output_y)
+        try:
+            output_y*1.0
+        except:
+            self.logger.error("Generated output is not of type 'Float'")
+            raise TypeError
         output_y = float(simplify(output_y))
         info_out='''
 
@@ -299,6 +308,7 @@ class EquationParser(object):
         try:
             return self.calculate(self.xarray)
         except:
+            self.logger.error("Failed to perform calculation on input values")
             return None
 
     def calculate(self, x):
@@ -332,6 +342,7 @@ class EquationParser(object):
             self.logger.error("Returned empty list of values.")
         
         if len(arr_y) == 1:
+            self.logger.debug("Calculation performed on single value.")
             return arr_y[0]
 
         return arr_y
