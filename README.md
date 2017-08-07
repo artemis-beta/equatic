@@ -51,7 +51,7 @@ x = np.linspace(-5*np.pi, 5*np.pi, 1000)
 
 parser = EquationParser( 'my parser'           ,
                           xarray     =  x      , 
-                          debug      =  ERROR
+                          log        =  'ERROR'
                        )
 
 # Finally tell the parser the equation to process
