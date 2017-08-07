@@ -97,3 +97,19 @@ EquatIC[1]: cos(1)
 ```
 
 the session is exited using `quit` or `q`.
+
+## Plotting Functions
+EquatIC includes a function for plotting via MatplotLib:
+```
+equatic.plot(equation_string, func_range=[0.1, 10], xlabel='x', ylabel='y', debug='ERROR', plot_opts = '-', save=None, show=True, title=None)
+```
+For example if we wanted to plot the function `tan(x-1)` in the range `[0,3.14]` we would do the following:
+```
+equatic.plot(   'tan(x-1)'                                   , 
+                [0,3.14]                                     ,
+                xlabel    = 'x'                              ,
+                ylabel    = 'f(x)'                           , 
+                title     = 'Plot of the Function 'tan(x-1)' ,
+                plot_opts = 'o'                              , 
+                save      = 'my_plot.png'                    )
+```
