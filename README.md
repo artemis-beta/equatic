@@ -1,4 +1,4 @@
-# EquatIC v0.2.0
+# EquatIC v1.0.0
 Equatic is a string equation parser which utilises the Sympy and Numpy libraries to evaluate equations for a given set of values, the two aims being to include more functions than those included in other methods and to evaluate values without the risk of 'danger' which is currently present within these. 
 
 ## Installation
