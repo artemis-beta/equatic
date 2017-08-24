@@ -109,3 +109,21 @@ equatic.plot(   'tan(x-1)'                                      ,
                 save      = 'my_plot.png'                       )
 ```
 Note EquatIC maintains MatplotLib's support of LaTeX strings for titles.
+
+## Add Your Own Functions
+EquatIC parsers can be expanded to include additional single argument functions using the `add_function` method. 
+
+For example say we wanted to add a simple function `quad` which multiplies any number by 4, firstly we define our function:
+```
+def quad(x):
+    return 4*x
+```
+then we add it to the parser's functions library:
+```
+parser.add_function('quad', quad)
+```
+we can now perform calculations using it:
+```
+parser.parse_equation_string('quad(x)')
+parser.plot()
+```
