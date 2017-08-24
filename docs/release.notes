@@ -4,6 +4,12 @@
 ! Purpose      : Safe equation string parser
 ! -------------------------------------------------------------------
 
+!========================= EquatIC v1.0.1 ===========================
+! 2017-08-24 - Kristian Zarebski
+
+ - Started Tidying Code using pylint
+ - Bug Fix: Cache now clears when parsing a new equation
+
 !========================= EquatIC v1.0.0 ===========================
 ! 2017-08-07 - Kristian Zarebski
 

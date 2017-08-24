@@ -5,9 +5,9 @@ Equation Parser Module
 Parser for equations as strings which avoids using the 'unclean' method of eval() within python.
 
 @author: Kristian Zarebski
-@data: Last modified - 2017/08/07
+@data: Last modified - 2017/08/24
 '''
-version = 'v1.0.0'
+version = 'v1.0.1'
 author = 'Kristian Zarebski'
 
 import logging
@@ -15,15 +15,19 @@ import mpmath as mt
 from sympy import simplify
 from numpy import atleast_1d, array, linspace
 from copy import deepcopy
-import re, sys
+import re
+import sys
 
 class EquationParser(object):
     '''Equation Parser Class'''
 
+    __version__ = version
+    __author__ = author
+
     def __init__(self, name, xarray=1E-36, log='INFO'):
         trig_dict = {'asin': mt.asin, 'acos': mt.acos, 'atan': mt.tan,
                      'cospi': mt.cospi, 'sinpi': mt.sinpi, 'sinc': mt.sinc,
-                     'cosec': mt.csc, 'sec': mt.sec, 'cot': mt.cot, 
+                     'cosec': mt.csc, 'sec': mt.sec, 'cot': mt.cot,
                      'sin': mt.sin, 'cos': mt.cos, 'tan': mt.tan}
         hyp_dict = {'asinh': mt.asinh, 'acosh': mt.acosh, 'atanh': mt.tanh,
                     'sinh': mt.sinh, 'cosh': mt.cosh, 'tanh': mt.tan,
@@ -64,19 +68,21 @@ class EquationParser(object):
         self._marked_dict_temp = None
         self.eqn_string = ''
         self.logger = logging.getLogger(__name__)
-        self.set_logger_level(log)   
+        self.set_logger_level(log)
         logging.basicConfig()
         self.eqn_string_template = ''
         self.eqn_string_id = ''
         self.accepted_opts = [')', '+', '-', '/', '*', '**']
-        
-        if not log in ['WARNING', 'DEBUG', 'ERROR', 'CRITICAL', 'INFO']:
+
+        if log not in ['WARNING', 'DEBUG', 'ERROR', 'CRITICAL', 'INFO']:
             self.logger.error("Invalid logger mode '%s'", log)
             sys.exit()
 
     def clean_input(self, string):
+        '''Check for any illegal/dangerous characters in query'''
         remainders = ''
-        bad_chars = [';', '\\', '{', '}', '@', '$', '^', '&', 'rm ', 'sudo', '~', '!', '#', ':', '|', '`', '\'', '"']
+        bad_chars = [';', '\\', '{', '}', '@', '$', '^', '&', 'rm ', 'sudo',
+                     '~', '!', '#', ':', '|', '`', '\'', '"']
         for char in bad_chars:
             if char in string:
                 remainders += char
@@ -87,11 +93,13 @@ class EquationParser(object):
         for key in keys:
             string = string.replace(key, '')
         if len(list(remainders)) != 0:
-               self.logger.critical("String contains Dangerous characters and will not be processed. Operation has terminated.")
-               raise SystemExit
+            self.logger.critical("String contains Dangerous characters and\
+                will not be processed. Operation has terminated.")
+            raise SystemExit
         elif len(string) != 0:
-               self.logger.error("String contains unrecognised character combinations.")
-               raise SystemExit
+            self.logger.error("String contains unrecognised character\
+                combinations.")
+            raise SystemExit
 
     def set_logger_level(self, level):
         '''Set Level of output for Equation Parser Log'''
@@ -106,8 +114,7 @@ class EquationParser(object):
         elif level == 'ERROR':
             self.logger.setLevel(logging.ERROR)
         else:
-            self.logger.error("Invalid Logger Setting %s.", level)        
-
+            self.logger.error("Invalid Logger Setting %s.", level)
 
     def apply_op(self, operation, val_str):
         '''Apply an operation to a value using parser operation dictionary'''
@@ -123,21 +130,26 @@ class EquationParser(object):
             raise ValueError
         try:
             val_str = str(simplify(val_str))
-            self.logger.debug("Attempting to apply %s(%s)", operation, val_str)
-            val_str = val_str.replace('(', '').replace(')', '') 
+            self.logger.debug("Attempting to apply %s(%s)",
+                              operation,
+                              val_str)
+            val_str = val_str.replace('(', '').replace(')', '')
             val = self.parser_dict[operation](float(val_str))
             return '({})'.format(val)
         except:
-            self.logger.error("Operation failed: Could not resolve %s(%s)", operation, val_str)
+            self.logger.error("Operation failed: Could not resolve %s(%s)",
+                              operation,
+                              val_str)
             raise ArithmeticError
     def check_for_ops(self, string):
+        '''Identify operations within input string'''
         for key in self.parser_dict:
             if key in string:
                 self.logger.debug("Found the operation '%s' in string.", key)
                 index = string.find(key)
                 index_2 = index
                 while string[index_2] != ')':
-                    index_2 +=1
+                    index_2 += 1
                 string = string.replace(key, '')
                 string = str(simplify(string))
                 try:
@@ -146,7 +158,8 @@ class EquationParser(object):
                     raise SystemExit
                 self.logger.debug("Evaluated operation and obtained value '%s'", string)
                 if 'j' in string:
-                    self.logger.critical("This version of EquatIC does not support computation of complex numbers.")
+                    self.logger.critical("This version of EquatIC does not\
+                     support computation of complex numbers.")
                     raise ValueError
         return string
 
@@ -174,15 +187,18 @@ class EquationParser(object):
 
         for i, j in zip(self.eqn_string_id, self.eqn_string_template):
             try:
-                if self.user_marked_dict[int(i)][-1] in self.accepted_opts or self.user_marked_dict[int(i)][-1] in self.parser_dict.keys():
+                if (self.user_marked_dict[int(i)][-1] in self.accepted_opts or
+                self.user_marked_dict[int(i)][-1] in self.parser_dict.keys()):
                     self.user_marked_dict[int(i)] += '|'
                 self.user_marked_dict[int(i)] += j
             except:
                 self.user_marked_dict[int(i)] = j
         for key in self.user_marked_dict:
             for element in self.accepted_opts[1:]:
-                self.user_marked_dict[key] = self.user_marked_dict[key].replace('{}|'.format(element),'{}'.format(element))
-        self.logger.debug("Successfully created dictionary:\n %s", self.user_marked_dict)
+                self.user_marked_dict[key] = self.user_marked_dict[key].replace(
+                    '{}|'.format(element),'{}'.format(element))
+        self.logger.debug("Successfully created dictionary:\n %s",
+                          self.user_marked_dict)
 
     def recursive_split(self, string):
         init_string = string
@@ -200,8 +216,10 @@ class EquationParser(object):
         except ValueError:
             self.logger.error("Failed to get maximum from equation dictionary.")
             if len(keys) == 0:
-                self.logger.error("Equation dictionary is empty. Did you forget to parse an equation string? or perhaps you have tried to evaluate f(x) "+
-                                  "where it is undefined? Try to run in debug mode for more information.")
+                self.logger.error("Equation dictionary is empty. \
+                Did you forget to parse an equation string? \
+                or perhaps you have tried to evaluate f(x) \
+                where it is undefined? Try to run in debug mode for more information.")
             raise SystemExit
         result = (self._marked_dict_temp[maximum].replace('x', '({})'.format(value)))
         result = self.recursive_split(result)
@@ -217,6 +235,7 @@ class EquationParser(object):
         return maximum
 
     def evaluate_layer_i(self, k, value):
+        '''Evaluate a single equation layer'''
         output_string = ''
         n = 0
         prior_list = self._marked_dict_temp[k+1]
@@ -242,6 +261,7 @@ class EquationParser(object):
         return k
 
     def evaluate_val(self, value):
+        '''Perform calculation on a single value'''
         self._marked_dict_temp = deepcopy(self.user_marked_dict)
         max = self.evaluate_first_layer_val(value)
         self.logger.debug("Evaluating equation for value %s", value)
@@ -277,7 +297,7 @@ class EquationParser(object):
             self.logger.error("Generated output is not of type 'Float'")
             raise TypeError
         output_y = float(simplify(output_y))
-        info_out='''
+        info_out = '''
 
         --------------------------------------------------------------
                             F({}) = {}
@@ -287,12 +307,19 @@ class EquationParser(object):
         self.logger.debug(info_out)
         return output_y
 
+    def reset(self):
+        '''Clear Cache if new Equation Parsed'''
+        self.eqn_string_id = ''
+        self.eqn_string_template = ''
+        self.user_marked_dict = {}
+
     def parse_equation_string(self, eqn_string):
+        '''Parse an equation which is of type string'''
+        self.reset()
         eqn_string = '({})'.format(eqn_string)
         self.logger.info(self._title)
         self.logger.debug(self._full_name)
-        self.clean_input(eqn_string)            
-        '''Parse an equation which is of type string'''
+        self.clean_input(eqn_string)
         debug_title = '''
         --------------------------------------------------------------
         EQUATION TO PARSE: {}
@@ -306,6 +333,8 @@ class EquationParser(object):
         self.eqn_string = eqn_string
         self.create_id_syntax()
         self.create_parse_dictionary()
+        if self.xarray == 1E-36:
+            return
         try:
             return self.calculate(self.xarray)
         except:
@@ -338,10 +367,13 @@ class EquationParser(object):
             sys.exit()
 
         if len(arr_y) > 0:
-            self.logger.info("Successfully calculated %s/%s values.", len(arr_y), len(arr_x))
+            self.logger.info("Successfully calculated %s/%s values.",
+                             len(arr_y),
+                             len(arr_x)
+                            )
         else:
             self.logger.error("Returned empty list of values.")
-        
+
         if len(arr_y) == 1:
             self.logger.debug("Calculation performed on single value.")
             return arr_y[0]
@@ -349,6 +381,7 @@ class EquationParser(object):
         return arr_y
 
     def add_function(self, name, func):
+        '''Add a new function to the parser's library'''
         self.parser_dict[name] = func
 
 def parse(equation_string, func_range=None, debug='ERROR'):
@@ -366,7 +399,15 @@ def parse(equation_string, func_range=None, debug='ERROR'):
 
     return temp_parser.calculate(x)
 
-def plot(equation_string, func_range=[0.1, 10], xlabel='x', ylabel='y', debug='ERROR', plot_opts = '-', save=None, show=True, title=None):
+def plot(equation_string, 
+         func_range=[0.1, 10], 
+         xlabel='x', 
+         ylabel='y', 
+         debug='ERROR', 
+         plot_opts = '-', 
+         save=None, 
+         show=True, 
+         title=None):
     import matplotlib.pyplot as plt
     num = 1000
     if len(func_range) > 2:
