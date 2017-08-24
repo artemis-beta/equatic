@@ -11,6 +11,7 @@
  - Bug Fix: Cache now clears when parsing a new equation
  - Added plotting direct from parser
  - Fixed 'add_function' for user defined additions
+ - Added cases to deal with values of infinity
 
 !========================= EquatIC v1.0.0 ===========================
 ! 2017-08-07 - Kristian Zarebski

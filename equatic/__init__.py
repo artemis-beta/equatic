@@ -13,7 +13,7 @@ author = 'Kristian Zarebski'
 import logging
 import mpmath as mt
 from sympy import simplify
-from numpy import atleast_1d, array, linspace
+from numpy import atleast_1d, array, linspace, where
 from copy import deepcopy
 import re
 import sys
@@ -37,11 +37,12 @@ class EquationParser(object):
 
         others_dict = {'sqrt': mt.sqrt, 'cbrt': mt.cbrt, 'root': mt.root,
                        'power': mt.power, 'expm1': mt.expm1,
-                       'fac': mt.factorial, 'fac2': mt.fac2, 'gamma': mt.gamma,
+                       'fac': mt.factorial, 'fac2': mt.fac2,
                        'rgamma': mt.gamma, 'loggamma': mt.loggamma,
-                       'superfac': mt.superfac, 'hyperfac': mt.hyperfac,
-                       'barnesg': mt.barnesg, 'psi': mt.psi,
-                       'harmonic': mt.harmonic, 'npdf' : mt.npdf}
+                       'gamma': mt.gamma, 'superfac': mt.superfac, 
+                       'hyperfac': mt.hyperfac, 'barnesg': mt.barnesg,
+                       'psi': mt.psi, 'harmonic': mt.harmonic,
+                       'npdf' : mt.npdf}
 
         self._title = '''
         ==========================================================
@@ -290,7 +291,8 @@ class EquationParser(object):
         output_y = output_y.replace('(', '').replace(')', '')
         self.logger.debug("Simplifying '%s'", output_y)
         self.logger.debug("Converting '%s' to float", simplify(output_y))
-        output_y = float(output_y)
+        # Need to handle infinities
+        output_y = float(output_y) if output_y != 'oo' else 1E-36 
         try:
             output_y*1.0
         except:
@@ -349,7 +351,15 @@ class EquationParser(object):
         arr_x = atleast_1d(x)
         arr_y = []
         for x in arr_x:
-            arr_y.append(self.evaluate_val(x))
+            val = self.evaluate_val(x)
+            try:
+                assert val != 1E-36
+            except:
+                import math
+                self.logger.warning('Function evaluates to Infinity...')
+                arr_y.append(math.inf)
+                continue
+            arr_y.append(val)
         arr_y = array(arr_y)
         y_output = '''
 
@@ -388,6 +398,10 @@ class EquationParser(object):
         self.parser_dict[name] = func
     
     def plot(self):
+        try:
+            assert self.xarray[4]
+        except AssertionError:
+            return plot(self.eqn_string, [self.xarray, self.xarray,1])
         return plot(self.eqn_string, 
                     [min(self.xarray), max(self.xarray), len(self.xarray)])
 
@@ -428,6 +442,14 @@ def plot(equation_string,
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
     plt.plot(x, y, plot_opts)
+    import math
+    if math.inf in y:
+        y_vals_list = y.tolist()
+        index = y_vals_list.index(math.inf)
+        y_vals_list.remove(math.inf)
+        x_tmp = array([x[index] for i in range(100)])
+        y_tmp = linspace(0, max(y_vals_list), 100)
+        plt.plot(x_tmp, y_tmp, '--')
     if save:
         plt.savefig(save)
     if show:
