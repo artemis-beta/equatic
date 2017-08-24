@@ -30,11 +30,6 @@ or
 
 `equatic.parse('npdf(x)', func_range=[-0.5, 0.5, 100], debug='ERROR')`
 
-## Plotting
-EquatIC uses Matplotlib to plot the results, similar to the case of `equatic.parse` a list is given which can have either two or three arguments depending on whether the user wishes to set the number of data points. The plots can also be saved to the current directory.
-
-`equatic.plot('harmonic(x)', func_range=[0, 10, 10], xlabel='x', ylabel='f(x)', debug='DEBUG', save='output.png')`
-
 ## Creating a Parser
 Below is an example of how the parser can be used, here a set of x values is generated using Numpy and then handed to the parser with the function then being parsed after. The x value set is not compulsary however when a set is specified the `parse_equation_string` method will return the resultant values for f(x). 
 
@@ -97,3 +92,20 @@ EquatIC[1]: cos(1)
 ```
 
 the session is exited using `quit` or `q`.
+
+## Plotting Functions
+EquatIC includes a function for plotting via MatplotLib:
+```
+equatic.plot(equation_string, func_range=[0.1, 10], xlabel='x', ylabel='y', debug='ERROR', plot_opts = '-', save=None, show=True, title=None)
+```
+For example if we wanted to plot the function `tan(x-1)` in the range `[0,3.14]` we would do the following:
+```
+equatic.plot(   'tan(x-1)'                                      , 
+                [0,3.14]                                        ,
+                xlabel    = 'x'                                 ,
+                ylabel    = 'f(x)'                              , 
+                title     = r"Plot of the Function '$tan(x-1)$'",
+                plot_opts = 'o'                                 , 
+                save      = 'my_plot.png'                       )
+```
+Note EquatIC maintains MatplotLib's support of LaTeX strings for titles.
