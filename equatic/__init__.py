@@ -333,8 +333,11 @@ class EquationParser(object):
         self.eqn_string = eqn_string
         self.create_id_syntax()
         self.create_parse_dictionary()
-        if self.xarray == 1E-36:
-            return
+        try:
+            self.xarray[0]
+        except:
+            if self.xarray == 1E-36:
+                return
         try:
             return self.calculate(self.xarray)
         except:
@@ -383,6 +386,10 @@ class EquationParser(object):
     def add_function(self, name, func):
         '''Add a new function to the parser's library'''
         self.parser_dict[name] = func
+    
+    def plot(self):
+        return plot(self.eqn_string, 
+                    [min(self.xarray), max(self.xarray), len(self.xarray)])
 
 def parse(equation_string, func_range=None, debug='ERROR'):
     temp_parser = EquationParser('temp')
