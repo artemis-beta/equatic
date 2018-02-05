@@ -1,6 +1,9 @@
 machine:
   python:
     version: 3.6.0
+dependencies:
+  pre:
+    - sudo apt-get install python-tk
 test:
   override:
     - nose2
