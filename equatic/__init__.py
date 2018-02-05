@@ -357,7 +357,7 @@ class EquationParser(object):
             except:
                 import math
                 self.logger.warning('Function evaluates to Infinity...')
-                arr_y.append(math.inf)
+                arr_y.append(float('inf'))
                 continue
             arr_y.append(val)
         arr_y = array(arr_y)
@@ -443,10 +443,10 @@ def plot(equation_string,
     plt.ylabel(ylabel)
     plt.plot(x, y, plot_opts)
     import math
-    if math.inf in y:
+    if float('inf') in y:
         y_vals_list = y.tolist()
-        index = y_vals_list.index(math.inf)
-        y_vals_list.remove(math.inf)
+        index = y_vals_list.index(float('inf'))
+        y_vals_list.remove(float('inf'))
         x_tmp = array([x[index] for i in range(100)])
         y_tmp = linspace(0, max(y_vals_list), 100)
         plt.plot(x_tmp, y_tmp, '--')
