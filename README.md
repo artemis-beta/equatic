@@ -5,7 +5,7 @@ Equatic is a string equation parser which utilises the Sympy and Numpy libraries
 
 There are two methods for installing EquatIC at present. You can either use `pip` from the package folder:
 
-`pip install .`
+`pip install -r requirements.txt`
 
 or you can run the setup script:
 
