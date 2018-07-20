@@ -60,8 +60,8 @@ class TestEQTC(unittest.TestCase):
         print("\nRunning Function Test: Complex Number Exception\n")
         test_array3 = np.linspace(0, 10*np.pi, 1000)
         test_parser3 = EquationParser('testFunction2', xarray=test_array3, log='ERROR')
-        test_y3 = test_parser3._parse_equation_string('log(-x)')
-        self.assertRaises(ValueError)
+        with self.assertRaises(ValueError):
+            test_parser3._parse_equation_string('log(-x)')
 
     def test_danger_case(self):
         print("\nRunning Danger Case Test: 'sudo rm -rf asdf_jkl'\n")
