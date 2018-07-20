@@ -3,7 +3,26 @@ machine:
     version: 3.6.0
 dependencies:
   pre:
-    - sudo apt-get install tk-dev
 test:
   override:
     - nose2
+version: 2
+jobs:
+    build:
+       docker:
+               - image: circleci/python:3.6.1
+       steps: 
+
+         - checkout
+         - run:
+              name: Install tk-dev
+              command: sudo apt-get install tk-dev
+         - run:
+              name: Create virtualenv
+              command: python -m venv myenv
+         - run:
+              name: Install app and test
+              command: |
+                      . myenv/bin/activate
+                      pip install .
+                      nose2
