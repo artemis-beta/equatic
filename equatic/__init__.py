@@ -156,7 +156,8 @@ class EquationParser(object):
                 try:
                     string = self.apply_op(key, string)
                 except:
-                    raise SystemExit
+                    self.logger.error("Failed to Apply Operation '{}'".format(key))
+                    raise ArithmeticError
                 self.logger.debug("Evaluated operation and obtained value '%s'", string)
                 if 'j' in string:
                     self.logger.critical("This version of EquatIC does not\
@@ -192,7 +193,7 @@ class EquationParser(object):
                 self.user_marked_dict[int(i)][-1] in self.parser_dict.keys()):
                     self.user_marked_dict[int(i)] += '|'
                 self.user_marked_dict[int(i)] += j
-            except:
+            except KeyError:
                 self.user_marked_dict[int(i)] = j
         for key in self.user_marked_dict:
             for element in self.accepted_opts[1:]:
@@ -256,7 +257,7 @@ class EquationParser(object):
                 output_list[i] = self.check_for_ops(str(output_list[i]))
             except:
                 self.logger.error("Operation check failed.")
-                raise SystemExit
+                raise RuntimeError
         self.logger.debug("Processed Layer %s: %s", k, output_list)
         self._marked_dict_temp[k] = output_list
         return k
@@ -280,7 +281,7 @@ class EquationParser(object):
                 try:
                     output_y = self._marked_dict_temp[k][0]
                     get_first_valid_key = False
-                except:
+                except KeyError:
                     k+=1
                     output_y = self._marked_dict_temp[k][0]
                     if len(self._marked_dict_temp) == 0:
@@ -295,7 +296,7 @@ class EquationParser(object):
         output_y = float(output_y) if output_y != 'oo' else 1E-36 
         try:
             output_y*1.0
-        except:
+        except TypeError:
             self.logger.error("Generated output is not of type 'Float'")
             raise TypeError
         output_y = float(simplify(output_y))
@@ -339,12 +340,12 @@ class EquationParser(object):
             self.xarray[0]
         except:
             if self.xarray == 1E-36:
-                return
+                raise ArithmeticError
         try:
             return self.calculate(self.xarray)
-        except:
+        except ArithmeticError:
             self.logger.error("Failed to perform calculation on input values")
-            return None
+            raise ArithmeticError
 
     def calculate(self, x):
         self.logger.info("Calculating %s for stated x values.", self.eqn_string)
@@ -354,7 +355,7 @@ class EquationParser(object):
             val = self.evaluate_val(x)
             try:
                 assert val != 1E-36
-            except:
+            except AssertionError:
                 import math
                 self.logger.warning('Function evaluates to Infinity...')
                 arr_y.append(float('inf'))
@@ -375,9 +376,9 @@ class EquationParser(object):
         self.logger.debug(y_output)
         try:
             len(arr_y)
-        except:
+        except TypeError:
             self.logger.error("Failed to find y values.")
-            sys.exit()
+            raise TypeError
 
         if len(arr_y) > 0:
             self.logger.info("Successfully calculated %s/%s values.",
