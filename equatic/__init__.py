@@ -94,8 +94,8 @@ class EquationParser(object):
         for key in keys:
             string = string.replace(key, '')
         if len(list(remainders)) != 0:
-            self.logger.critical("String contains Dangerous characters and\
-                will not be processed. Operation has terminated.")
+            self.logger.critical("String contains Dangerous characters and "+
+                "will not be processed. Operation has terminated.")
             raise SystemExit
         elif len(string) != 0:
             self.logger.error("String contains unrecognised character\
@@ -315,7 +315,7 @@ class EquationParser(object):
         self.eqn_string_template = ''
         self.user_marked_dict = {}
 
-    def parse_equation_string(self, eqn_string):
+    def _parse_equation_string(self, eqn_string):
         '''Parse an equation which is of type string'''
         self.reset()
         eqn_string = '({})'.format(eqn_string)
@@ -408,7 +408,7 @@ class EquationParser(object):
 def parse(equation_string, func_range=None, debug='ERROR'):
     temp_parser = EquationParser('temp')
     temp_parser.set_logger_level(debug)
-    temp_parser.parse_equation_string(equation_string)
+    temp_parser._parse_equation_string(equation_string)
     if not isinstance(func_range, list):
         if not func_range:
             x = 0
