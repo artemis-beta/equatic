@@ -7,7 +7,7 @@ Parser for equations as strings which avoids using the 'unclean' method of eval(
 @author: Kristian Zarebski
 @data: Last modified - 2017/08/24
 '''
-version = 'v1.0.1'
+version = 'v1.0.2'
 author = 'Kristian Zarebski'
 
 import logging
@@ -336,10 +336,12 @@ class EquationParser(object):
         self.create_parse_dictionary()
         try:
             self.xarray[0]
-            if self.xarray == 1E-36:
-                raise ArithmeticError
         except TypeError:
             self.logger.debug("Single Value Detected")
+            last_elem = len(self.user_marked_dict.keys())
+            self.xarray = float(self.user_marked_dict[last_elem].replace('(','').replace(')',''))
+            if self.xarray == 1E-36:
+                raise ArithmeticError
             self.xarray = [self.xarray]
         self.logger.debug(debug_title)
             
