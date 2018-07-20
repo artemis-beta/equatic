@@ -98,8 +98,8 @@ class EquationParser(object):
                 "will not be processed. Operation has terminated.")
             raise SystemExit
         elif len(string) != 0:
-            self.logger.error("String contains unrecognised character\
-                combinations.")
+            self.logger.error("String contains unrecognised character"+
+                " combinations.")
             raise SystemExit
 
     def set_logger_level(self, level):
