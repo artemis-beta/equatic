@@ -29,7 +29,7 @@ def run_calc():
     i = 0
     out = '0'
     while True:
-         inp = raw_input(prompt.format(i))
+         inp = input(prompt.format(i))
          inp = inp.replace('_', str(out))
          if inp in ['q', 'quit', 'Q']:
              return
