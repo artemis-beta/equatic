@@ -9,10 +9,10 @@ setup(name                =  'equatic'                                     ,
       license             =  'MIT'                                         ,
       packages            =  ['equatic']                                   ,
       zip_safe            =  False                                         ,
-      tests_require       =  ['nose2']                                    ,
       install_requires    =  [ 'numpy>=1.11.3'      ,
                                'sympy>=1.0'         ,
                                'matplotlib>=2.0.0'  ,
-                               'mpmath'
+                               'mpmath'             ,
+                               'nose2'
                              ]
      )
