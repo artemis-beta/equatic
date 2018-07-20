@@ -95,9 +95,8 @@ class TestEQTC(unittest.TestCase):
 
     def test_new_func(self):
         print("\nRunning New Function Test: 'reciprocal(2)'")
-        test_parser8 = EquationParser('testnewFunc', log='ERROR')
-        def reciprocal(num):
-            return float(1./num)
+        test_parser8 = EquationParser('testnewFunc', log='DEBUG')
+        reciprocal = lambda x : float(1./x)
         test_parser8.add_function('reciprocal', reciprocal)
         y = test_parser8._parse_equation_string('reciprocal(2)')
         self.assertEqual(0.5, y)
