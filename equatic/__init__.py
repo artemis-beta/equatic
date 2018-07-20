@@ -98,8 +98,7 @@ class EquationParser(object):
                 "will not be processed. Operation has terminated.")
             raise SystemExit
         elif len(string) != 0:
-            self.logger.error("String contains unrecognised character"+
-                " combinations.")
+            self.logger.error("String contains unrecognised character combinations.")
             raise SystemExit
 
     def set_logger_level(self, level):
@@ -332,15 +331,18 @@ class EquationParser(object):
 
         '''.format(eqn_string, self.xarray)
 
-        self.logger.debug(debug_title)
         self.eqn_string = eqn_string
         self.create_id_syntax()
         self.create_parse_dictionary()
         try:
             self.xarray[0]
-        except:
             if self.xarray == 1E-36:
                 raise ArithmeticError
+        except TypeError:
+            self.logger.debug("Single Value Detected")
+            self.xarray = [self.xarray]
+        self.logger.debug(debug_title)
+            
         try:
             return self.calculate(self.xarray)
         except ArithmeticError:
