@@ -296,7 +296,7 @@ class EquationParser(object):
         self.logger.debug("Simplifying '%s'", output_y)
         self.logger.debug("Converting '%s' to float", simplify(output_y))
         # Need to handle infinities
-        output_y = float(output_y) if output_y != 'oo' else 1E-36 
+        output_y = float(output_y) if 'oo' not in output_y else 1E-36 
         try:
             output_y*1.0
         except TypeError:
