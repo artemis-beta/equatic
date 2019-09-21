@@ -127,3 +127,6 @@ we can now perform calculations using it:
 parser.parse_equation_string('quad(x)')
 parser.plot()
 ```
+| Branch  | Tests |
+|---|---|
+| Master | [![CircleCI](https://circleci.com/gh/artemis-beta/equatic/tree/master.svg?style=svg)](https://circleci.com/gh/artemis-beta/equatic/tree/master)|
