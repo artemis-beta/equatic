@@ -7,7 +7,7 @@ Parser for equations as strings which avoids using the 'unclean' method of eval(
 @author: Kristian Zarebski
 @data: Last modified - 2017/08/24
 '''
-version = 'v1.0.2'
+version = 'v1.0.3'
 author = 'Kristian Zarebski'
 
 import logging
@@ -24,7 +24,7 @@ class EquationParser(object):
     __version__ = version
     __author__ = author
 
-    def __init__(self, name, xarray=1E-36, log='INFO'):
+    def __init__(self, name, xarray=None, log='INFO'):
         trig_dict = {'asin': mt.asin, 'acos': mt.acos, 'atan': mt.tan,
                      'cospi': mt.cospi, 'sinpi': mt.sinpi, 'sinc': mt.sinc,
                      'cosec': mt.csc, 'sec': mt.sec, 'cot': mt.cot,
@@ -64,13 +64,17 @@ class EquationParser(object):
         self.parser_dict.update(trig_dict)
         self.parser_dict.update(log_ind_dict)
         self.parser_dict.update(others_dict)
-        self.xarray = xarray
+        self.xarray = xarray if xarray else 0
+        if isinstance(self.xarray, int) or isinstance(self.xarray, float):
+            self.xarray = [self.xarray]
         self.user_marked_dict = {}
         self._marked_dict_temp = None
         self.eqn_string = ''
         self.logger = logging.getLogger(__name__)
         self.set_logger_level(log)
         logging.basicConfig()
+        if xarray == None:
+            self.logger.info("No x value chosen, using default value '0' for intial parsing")
         self.eqn_string_template = ''
         self.eqn_string_id = ''
         self.accepted_opts = [')', '+', '-', '/', '*', '**']
@@ -315,7 +319,7 @@ class EquationParser(object):
         self.eqn_string_template = ''
         self.user_marked_dict = {}
 
-    def _parse_equation_string(self, eqn_string):
+    def parse_equation_string(self, eqn_string):
         '''Parse an equation which is of type string'''
         self.reset()
         eqn_string = '({})'.format(eqn_string)
@@ -413,7 +417,7 @@ class EquationParser(object):
 def parse(equation_string, func_range=None, debug='ERROR'):
     temp_parser = EquationParser('temp')
     temp_parser.set_logger_level(debug)
-    temp_parser._parse_equation_string(equation_string)
+    temp_parser.parse_equation_string(equation_string)
     if not isinstance(func_range, list):
         if not func_range:
             x = 0

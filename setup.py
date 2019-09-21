@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name                =  'equatic'                                     ,
-      version             =  '1.0.1'                                       ,
+      version             =  '1.0.3'                                       ,
       description         =  'Safe Equation Parser via Sympy and Numpy.'   ,
       url                 =  'http://github.com/artemis-beta/equatic'      ,
       author              =  'Kristian Zarebski'                           ,
