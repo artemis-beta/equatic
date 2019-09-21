@@ -64,7 +64,7 @@ class EquationParser(object):
         self.parser_dict.update(trig_dict)
         self.parser_dict.update(log_ind_dict)
         self.parser_dict.update(others_dict)
-        self.xarray = xarray if xarray else 0
+        self.xarray = xarray if xarray is not None else 0
         if isinstance(self.xarray, int) or isinstance(self.xarray, float):
             self.xarray = [self.xarray]
         self.user_marked_dict = {}
@@ -73,7 +73,7 @@ class EquationParser(object):
         self.logger = logging.getLogger(__name__)
         self.set_logger_level(log)
         logging.basicConfig()
-        if xarray == None:
+        if xarray is None:
             self.logger.info("No x value chosen, using default value '0' for intial parsing")
         self.eqn_string_template = ''
         self.eqn_string_id = ''

@@ -9,7 +9,7 @@ class TestEQTC(unittest.TestCase):
         print("\nRunning Function Test: x-1\n")
         test_array = np.linspace(-10, 10, 1000)
         test_parser = EquationParser('testLinear', xarray=test_array, log='ERROR')
-        test_y = test_parser._parse_equation_string('x-1')
+        test_y = test_parser.parse_equation_string('x-1')
         y = test_array - 1
         if plot:
             import matplotlib.pyplot as plt
@@ -26,7 +26,7 @@ class TestEQTC(unittest.TestCase):
         print("\nRunning Function Test: sinc(x)\n")
         test_array1 = np.linspace(-10*np.pi, 10*np.pi, 1000)
         test_parser1 = EquationParser('testFunction1', xarray=test_array1, log='ERROR')
-        test_y1 = test_parser1._parse_equation_string('sinc(x)')
+        test_y1 = test_parser1.parse_equation_string('sinc(x)')
         y1 = np.array([float(mpm.sinc(i)) for i in test_array1])
         if plot:
             import matplotlib.pyplot as plt
@@ -43,7 +43,7 @@ class TestEQTC(unittest.TestCase):
         print("\nRunning Function Test: cos(tan(x+1)+sin(x))\n")
         test_array2 = np.linspace(-10*np.pi, 10*np.pi, 1000)
         test_parser2 = EquationParser('testFunction2', xarray=test_array2, log='ERROR')
-        test_y2 = test_parser2._parse_equation_string('cos(tan(0.5*x+1)+sin(0.5*x))')
+        test_y2 = test_parser2.parse_equation_string('cos(tan(0.5*x+1)+sin(0.5*x))')
         y2 = np.array([float(mpm.cos(mpm.tan(0.5*i+1)+mpm.sin(0.5*i))) for i in test_array2])
         if plot:
             import matplotlib.pyplot as plt 
@@ -61,19 +61,19 @@ class TestEQTC(unittest.TestCase):
         test_array3 = np.linspace(0, 10*np.pi, 1000)
         test_parser3 = EquationParser('testFunction2', xarray=test_array3, log='ERROR')
         with self.assertRaises(ValueError):
-            test_parser3._parse_equation_string('log(-x)')
+            test_parser3.parse_equation_string('log(-x)')
 
     def test_danger_case(self):
         print("\nRunning Danger Case Test: 'sudo rm -rf asdf_jkl'\n")
         test_parser4 = EquationParser('testDanger', log='ERROR')
         with self.assertRaises(SystemExit):
-            test_parser4._parse_equation_string('sudo rm -rf asdf_jkl')
+            test_parser4.parse_equation_string('sudo rm -rf asdf_jkl')
 
     def test_typo_case(self):
         print("\nRunning Typo Case Test: 'w00ps(x)'\n")
         test_parser5 = EquationParser('testTypo', log='ERROR')
         with self.assertRaises(SystemExit):
-            test_parser5._parse_equation_string('w00ps(x)')
+            test_parser5.parse_equation_string('w00ps(x)')
     
     def test_apply_num_op(self):
         print("\nRunning Invalid Operation Type Test: '587'")
@@ -98,14 +98,14 @@ class TestEQTC(unittest.TestCase):
         test_parser8 = EquationParser('testnewFunc', log='ERROR')
         reciprocal = lambda x : float(1./x)
         test_parser8.add_function('reciprocal', reciprocal)
-        y = test_parser8._parse_equation_string('reciprocal(2)')
+        y = test_parser8.parse_equation_string('reciprocal(2)')
         self.assertEqual(0.5, y)
 
     def test_square_func(self, plot=False):
         print("\nRunning Function Test: 'x**2'")
         test_array = np.linspace(-10, 10, 1000)
         test_parser = EquationParser('testSquare', xarray=test_array, log='ERROR')
-        test_y = test_parser._parse_equation_string('x**2')
+        test_y = test_parser.parse_equation_string('x**2')
         y = np.square(test_array)
         if plot:
             import matplotlib.pyplot as plt 
@@ -122,7 +122,7 @@ class TestEQTC(unittest.TestCase):
         print("\nRunning Function Test: 'tan(x)-sin(x)'")
         test_array = np.linspace(-10, 10, 1000)
         test_parser = EquationParser('testSquare', xarray=test_array, log='ERROR')
-        test_y = test_parser._parse_equation_string('tan(x)-sin(x)')
+        test_y = test_parser.parse_equation_string('tan(x)-sin(x)')
         y = np.tan(test_array)-np.sin(test_array)
         if plot:
             import matplotlib.pyplot as plt 
