@@ -49,8 +49,8 @@ class TestEQTC(unittest.TestCase):
         _logger.info("\nRunning Function Test: cos(tan(x+1)+sin(x))\n")
         test_array2 = np.linspace(-10*np.pi, 10*np.pi, 1000)
         test_parser2 = EquationParser('testFunction2', xarray=test_array2, log='ERROR')
-        test_y2 = test_parser2.parse_equation_string('cos(tan(0.5*x+1)+sin(0.5*x))')
-        y2 = np.array([float(mpm.cos(mpm.tan(0.5*i+1)+mpm.sin(0.5*i))) for i in test_array2])
+        test_y2 = test_parser2.parse_equation_string('cos(tan(x+1)+sin(x))')
+        y2 = np.array([float(mpm.cos(mpm.tan(i+1)+mpm.sin(i))) for i in test_array2])
         if plot:
             import matplotlib.pyplot as plt 
             plt.xlabel('x')
@@ -146,6 +146,12 @@ class TestEQTC(unittest.TestCase):
         test_parser = EquationParser('testInfty', xarray=-1, log='ERROR')
         value = test_parser.parse_equation_string('1/(x+1)')
         self.assertEqual(value, np.inf)
+
+    def test_chained_functions_on_int(self):
+       _logger.info("\nRunning Chained Functions Test on Integer: 'tan(x)+sin(x)'")
+       test_parser = EquationParser('testChainedFunc', xarray=5, log='DEBUG')
+       value = test_parser.parse_equation_string('tan(x)+sin(x)')
+       self.assertAlmostEqual(value, float(mpm.tan(5)+mpm.sin(5)),places=5)
         
 
 if __name__ == '__main__':

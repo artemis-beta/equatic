@@ -7,7 +7,7 @@ Parser for equations as strings which avoids using the 'unclean' method of eval(
 @author: Kristian Zarebski
 @data: Last modified - 2017/08/24
 '''
-version = 'v1.0.3'
+version = 'v1.0.4'
 author = 'Kristian Zarebski'
 
 import logging
@@ -66,7 +66,7 @@ class EquationParser(object):
         self.parser_dict.update(others_dict)
         self.xarray = xarray if xarray is not None else 0
         if isinstance(self.xarray, int) or isinstance(self.xarray, float):
-            self.xarray = [self.xarray]
+            self.xarray = [float(self.xarray)]
         self.user_marked_dict = {}
         self._marked_dict_temp = None
         self.eqn_string = ''
@@ -145,6 +145,7 @@ class EquationParser(object):
                               operation,
                               val_str)
             raise ArithmeticError
+
     def check_for_ops(self, string):
         '''Identify operations within input string'''
         for key in self.parser_dict:
@@ -415,8 +416,12 @@ class EquationParser(object):
                     [min(self.xarray), max(self.xarray), len(self.xarray)])
 
 def parse(equation_string, func_range=None, debug='ERROR'):
-    temp_parser = EquationParser('temp')
-    temp_parser.set_logger_level(debug)
+    temp_parser = EquationParser('temp', log=debug)
+    get_nums = re.findall(r'([\d|\.|-]+)', equation_string)
+    get_nums = list(dict.fromkeys(get_nums))
+    get_nums = sorted(get_nums, key=len)
+    for num in get_nums:
+        equation_string = equation_string.replace(num, str(float(num)))
     temp_parser.parse_equation_string(equation_string)
     if not isinstance(func_range, list):
         if not func_range:

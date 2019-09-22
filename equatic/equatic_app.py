@@ -6,16 +6,17 @@ def run_calc():
     prompt = 'EquatIC[{}]: '
 
     arg_parser = argparse.ArgumentParser()
-    arg_parser.add_argument('-v', '--verbose', help='set logging output to DEBUG', action='store_true')
-    arg_parser.add_argument('-i', '--info', help='set logging output to INFO', action='store_true')
-    arg_parser.add_argument('-s', '--save', help='save output', action='store_true')
+    arg_parser.add_argument('-v', '--verbose', help='set logging output to DEBUG', action='store_true', default=False)
+    arg_parser.add_argument('-i', '--info', help='set logging output to INFO', action='store_true', default=False)
+    arg_parser.add_argument('-s', '--save', help='save output', action='store_true', default=False)
     arg_parser.add_argument('-o', '--saveas', help='save output and give name')
-    log = 'ERROR'
     args = arg_parser.parse_args()
     if args.verbose:
         log = 'DEBUG'
     elif args.info:
         log = 'INFO'
+    else:
+        log = 'ERROR'
 
     if args.save:
         if args.saveas:
@@ -33,7 +34,7 @@ def run_calc():
          inp = inp.replace('_', str(out))
          if inp in ['q', 'quit', 'Q']:
              return
-         out = equatic.parse(inp)
+         out = equatic.parse(inp, debug=log)
          print(out)
          if args.save:
              f.write(str(out))
